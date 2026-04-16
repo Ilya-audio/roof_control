@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <index version="1" name="Rooftop Studio repo" commit="main">
-  <category name="Roof Control">
-    <reapack name="Roof Control" type="effect" version="0.9">
+  <category name="Effects/roof_control">
+    <reapack name="roof_control" type="effect" version="0.9">
       <metadata>
-        <description>Roof|control: Headphone Correction, Speaker Emulation and Bubrik System</description>
+        <description>Roof|control: Headphone Correction and Mix Check</description>
         <link rel="website">https://github.com/Ilya-audio/roof_JSFX_scripts</link>
       </metadata>
       <version name="0.9">
-        <source file="roof_control/roof_control">https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Effects/roof_control/roof_control</source>
-        
+        <source>https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Effects/roof_control/roof_control</source>
         <supplement>
+          <metadata>
+            <description>GUI assets and backend</description>
+          </metadata>
           <source file="../../Scripts/roof_control/roof_bubrik.lua">https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Scripts/roof_control/roof_bubrik.lua</source>
-          
           <source file="../../Data/roof_control/gui/background.png">https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/background.png</source>
           <source file="../../Data/roof_control/gui/background_dark.png">https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/background_dark.png</source>
           <source file="../../Data/roof_control/gui/bypass.png">https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/bypass.png</source>
