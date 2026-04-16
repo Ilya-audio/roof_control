@@ -25,7 +25,7 @@ Allows you to quickly check your mix across various sound sources:
 * **Smartphone** – Mobile speaker simulation (based on Monitoring 3).
 * **SLEW** – (The mysterious device on the right side of the desk) A detector for "fast" events in the mix. Great for identifying transient-related issues.
 * **Subwoofer** – A recreation of the Monitoring 3 mode for checking low-end conflicts.
-* **Fullrange** – A custom mode I built by combining modes 1 and 6. It mimics the feel of home theaters or club systems.
+* **Fullrange** – A custom mode I built by combining modes 1 and 6 (activated by clicking on the central control deck). It mimics the feel of home theaters or club systems.
 
 ### 2. Headphone Correction Block
 The plugin utilizes profiles from the AutoEQ project (though you are free to use your own measurements).
@@ -60,7 +60,8 @@ Based on the well-known BS2B project, but with one significant modification. The
     1. Send only the Left or Right channel into the plugin.
     2. Adjust the **cutoff** until you achieve a comfortable tone (700-800 Hz).
     3. Switch back to stereo and adjust **suppression**.
-    4. Gradually increase the **ITD** to open up the soundstage.
+    4. Send only the Left or Right channel into the plugin.
+    5. Gradually increase the **ITD** to open up the soundstage.
     * *My sweet spot: cutoff 800, suppression 6 dB, ITD 0.12 ms.*
 
 ## Known Features
