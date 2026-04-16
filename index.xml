@@ -1,40 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
 <index version="1" name="Rooftop Studio repo" commit="main">
-  <category name="Effects/roof_control">
+
+  <category name="Roof Control">
+
     <reapack name="roof_control" type="effect" version="0.9">
+
       <metadata>
         <description>Roof|control: Headphone Correction and Mix Check</description>
         <link rel="website">https://github.com/Ilya-audio/roof_JSFX_scripts</link>
       </metadata>
+
       <version name="0.9">
-        <source>https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Effects/roof_control/roof_control</source>
+
+        <!-- JSFX -->
+        <source file="Effects/roof_control/roof_control">
+          https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Effects/roof_control/roof_control
+        </source>
+
         <supplement>
-          <metadata>
-            <description>GUI assets and backend</description>
-          </metadata>
-          <source file="../../Scripts/roof_control/roof_bubrik.lua">https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Scripts/roof_control/roof_bubrik.lua</source>
-          <source file="../../Data/roof_control/gui/background.png">https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/background.png</source>
-          <source file="../../Data/roof_control/gui/background_dark.png">https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/background_dark.png</source>
-          <source file="../../Data/roof_control/gui/bypass.png">https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/bypass.png</source>
-          <source file="../../Data/roof_control/gui/bypass_select.png">https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/bypass_select.png</source>
-          <source file="../../Data/roof_control/gui/config.png">https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/config.png</source>
-          <source file="../../Data/roof_control/gui/cubes.png">https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/cubes.png</source>
-          <source file="../../Data/roof_control/gui/cubes_on.png">https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/cubes_on.png</source>
-          <source file="../../Data/roof_control/gui/fullrange.png">https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/fullrange.png</source>
-          <source file="../../Data/roof_control/gui/fullrange_on.png">https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/fullrange_on.png</source>
-          <source file="../../Data/roof_control/gui/fullrange_select.png">https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/fullrange_select.png</source>
-          <source file="../../Data/roof_control/gui/main.png">https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/main.png</source>
-          <source file="../../Data/roof_control/gui/main_on.png">https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/main_on.png</source>
-          <source file="../../Data/roof_control/gui/slew.png">https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/slew.png</source>
-          <source file="../../Data/roof_control/gui/slew_on.png">https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/slew_on.png</source>
-          <source file="../../Data/roof_control/gui/smartphone.png">https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/smartphone.png</source>
-          <source file="../../Data/roof_control/gui/smartphone_on.png">https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/smartphone_on.png</source>
-          <source file="../../Data/roof_control/gui/sub.png">https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/sub.png</source>
-          <source file="../../Data/roof_control/gui/sub_on.png">https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/sub_on.png</source>
-          <source file="../../Data/roof_control/gui/vinyl.png">https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/vinyl.png</source>
-          <source file="../../Data/roof_control/gui/vinyl_on.png">https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/vinyl_on.png</source>
+
+          <!-- Lua script -->
+          <source file="Scripts/roof_control/roof_bubrik.lua">
+            https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Scripts/roof_control/roof_bubrik.lua
+          </source>
+
+          <!-- GUI assets -->
+          <source file="Data/roof_control/gui/background.png">
+            https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/background.png
+          </source>
+
+          <source file="Data/roof_control/gui/background_dark.png">
+            https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/background_dark.png
+          </source>
+
+          <source file="Data/roof_control/gui/bypass.png">
+            https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/bypass.png
+          </source>
+
+          <source file="Data/roof_control/gui/bypass_select.png">
+            https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/bypass_select.png
+          </source>
+
+          <source file="Data/roof_control/gui/config.png">
+            https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/config.png
+          </source>
+
+          <source file="Data/roof_control/gui/cubes.png">
+            https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/cubes.png
+          </source>
+
+          <source file="Data/roof_control/gui/cubes_on.png">
+            https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/cubes_on.png
+          </source>
+
+          <source file="Data/roof_control/gui/fullrange.png">
+            https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/fullrange.png
+          </source>
+
+          <source file="Data/roof_control/gui/fullrange_on.png">
+            https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/fullrange_on.png
+          </source>
+
+          <source file="Data/roof_control/gui/fullrange_select.png">
+            https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/fullrange_select.png
+          </source>
+
+          <source file="Data/roof_control/gui/main.png">
+            https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/main.png
+          </source>
+
+          <source file="Data/roof_control/gui/main_on.png">
+            https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/main_on.png
+          </source>
+
+          <source file="Data/roof_control/gui/slew.png">
+            https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/slew.png
+          </source>
+
+          <source file="Data/roof_control/gui/slew_on.png">
+            https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/slew_on.png
+          </source>
+
+          <source file="Data/roof_control/gui/smartphone.png">
+            https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/smartphone.png
+          </source>
+
+          <source file="Data/roof_control/gui/smartphone_on.png">
+            https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/smartphone_on.png
+          </source>
+
+          <source file="Data/roof_control/gui/sub.png">
+            https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/sub.png
+          </source>
+
+          <source file="Data/roof_control/gui/sub_on.png">
+            https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/sub_on.png
+          </source>
+
+          <source file="Data/roof_control/gui/vinyl.png">
+            https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/vinyl.png
+          </source>
+
+          <source file="Data/roof_control/gui/vinyl_on.png">
+            https://github.com/Ilya-audio/roof_JSFX_scripts/raw/main/Data/roof_control/gui/vinyl_on.png
+          </source>
+
         </supplement>
+
       </version>
     </reapack>
+
   </category>
+
 </index>
