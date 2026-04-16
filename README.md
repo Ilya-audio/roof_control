@@ -48,7 +48,7 @@ Based on the well-known BS2B project, but with one significant modification. The
     * Download the `.txt` profile and place it into: `*reaper resource folder*/Data/roof_control/phones_eq`.
 5. **Run Backend:** Go to the "Actions" menu, add and run the `roof_bubrik.lua` satellite script. 
    * *Note: JSFX has limited file-handling, so this script is essential. If you use SWS, add it to your startup actions.*
-6. **Load Plugin:** Open **JS: roof_control**. Place it in the **Monitoring FX** section AFTER all your meters.
+6. **Load Plugin:** Open **JS: roof|control**. Place it in the **Monitoring FX** section AFTER all your meters.
 
 ---
 
