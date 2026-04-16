@@ -71,3 +71,7 @@ The plugin is designed to function as a single, unified monitoring hub. Because 
 
 **P.S. Why the name "roof_bubrik"?**
 I have a studio cat named **Bubrik**. She is in charge of comfort and constantly monitors the operating temperature of my gear. She’s a vital team member—without her, everything would fall apart. Since the background script performs a similar "maintenance" role, I decided to name it after her. :)
+
+<p align="center">
+<img width="1195" height="675" alt="Bubrik" src="https://github.com/user-attachments/assets/ce03f4d3-d99f-46f1-8b5a-a8b397afe632" />
+</p>
