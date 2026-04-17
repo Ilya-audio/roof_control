@@ -61,7 +61,7 @@ Based on the well-known BS2B project, but with one significant modification. The
 * **Gain:** Adjust the Gain slider so that toggling correction doesn't change the overall volume. Double-clicking the slider restores the value saved in your profile, and the SAVE button writes your current setting back to the file.
 * **True Stereo Setup:**
     1. Send only the Left or Right channel into the plugin.
-    2. Adjust the **cutoff** until you achieve a comfortable tone (700-800 Hz).
+    2. Adjust the **cutoff** until you achieve a comfortable tone.
     3. Switch back to stereo and adjust **suppression**.
     4. Send only the Left or Right channel into the plugin.
     5. Gradually increase the **ITD** to open up the soundstage.
