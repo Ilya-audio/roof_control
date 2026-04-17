@@ -23,7 +23,7 @@ Roof|control combines headphone correction, crossfeed with adjustable ITD, and m
 ### 1. Speaker Emulation Module
 Lets you quickly check your mix across various playback systems:
 * **Main Monitors** – Transparent mode with no processing. This is the primary mode for mixing.
-* **Cubes** – Emulation of the famous Auratone "mix cubes."
+* **Cubes** – Custom emulation of the famous Auratone "mix cubes."
 * **Vinyl** – A faithful recreation of the mode found in AirWindows Monitoring 3.
 * **Smartphone** – Mobile speaker simulation (based on Monitoring 3).
 * **SLEW** – (The mysterious device on the right side of the desk) A detector for "fast" events in the mix. Great for identifying transient-related issues.
