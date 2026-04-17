@@ -146,7 +146,7 @@ Roof|control is built upon the foundation of several incredible open-source proj
 * **BS2B (Bauer stereophonic-to-binaural DSP)** — Boris Mikhailov  
   The core crossfeed approach used as the foundation for the True-Stereo processing section.
 
-* **Airwindows Monitoring 3** — Chris Johnson  
+* **Airwindows plug-ins** — Chris Johnson  
   Conceptual and algorithmic inspiration for the Vinyl, Smartphone, Subwoofer, and SLEW translation modes.
 
 ---
