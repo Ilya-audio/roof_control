@@ -1,5 +1,5 @@
 # Roof|control
-### A new JSFX plugin for phones-correction and mix-checking
+### A lightweight headphone monitoring system for REAPER
 
 Hi everyone!
 
@@ -15,13 +15,13 @@ I own licenses for several commercial monitoring plugins, but I really wanted a 
 
 ---
 
-What makes it different?
+## What makes it different?
 Roof|control combines headphone correction, crossfeed with adjustable ITD, and mix translation emulation into a single lightweight JSFX chain designed specifically for REAPER monitoring FX.
 
 ## Main Modules
 
 ### 1. Speaker Emulation Module
-Allows you to quickly check your mix across various sound sources:
+Lets you quickly check your mix across various playback systems:
 * **Main Monitors** – Transparent mode with no processing. This is the primary mode for mixing.
 * **Cubes** – Emulation of the famous Auratone "mix cubes."
 * **Vinyl** – A faithful recreation of the mode found in AirWindows Monitoring 3.
@@ -31,10 +31,10 @@ Allows you to quickly check your mix across various sound sources:
 * **Fullrange** – A custom mode I built by combining modes 1 and 6 (activated by clicking on the central control deck). It mimics the feel of home theaters or club systems.
 
 ### 2. Headphone Correction Block
-The plugin utilizes profiles from the AutoEQ project (though you are free to use your own measurements).
+The plugin uses profiles from the AutoEQ project (though you are free to use your own measurements).
 
 ### 3. True-Stereo Block
-Based on the well-known BS2B project, but with one significant modification. The original author of BS2B intentionally omitted a delay for the crossfeed signal. I have added an **ITD (Interaural Time Difference)** parameter, which significantly improves the naturalness and perceived width of the stereo image.
+Based on the well-known BS2B project, but with one significant modification. The original author of BS2B intentionally omitted a delay for the crossfeed signal. I have added an **ITD (Interaural Time Difference)** parameter, which significantly improves stereo naturalness and creates a more speaker-like stereo image.
 
 > **Note:** This module is active only for the following modes: Main, Cubes, Vinyl, and Fullrange.
 
@@ -44,14 +44,14 @@ Based on the well-known BS2B project, but with one significant modification. The
 
 1. **Download:** Get the latest release from the [Releases page](https://github.com/Ilya-audio/roof_JSFX_scripts/releases).
 2. **Install:** Extract the contents into your **REAPER Resource Path**.
-3. **Get and Setup your Profile:**
+3. **Set up your headphone profile**
     * Go to [autoeq.app](https://autoeq.app) and find your headphone model.
     * In the **Select Equalizer App** dropdown, choose **Custom Parametric EQ**.
-    * Adjust filters: Check if there are more "useful" filters available (AutoEQ defaults to 5).
+    * Adjust filters: check if additional filters are available (AutoEQ defaults to 5).
     * Download the `.txt` profile and place it into: `*reaper resource folder*/Data/roof_control/phones_eq`.
 5. **Run Backend:** Go to the "Actions" menu, add and run the `roof_bubrik.lua` satellite script. 
    * *Note: JSFX has limited file-handling, so this script is essential. If you use SWS, add it to your startup actions.*
-6. **Load Plugin:** Open **JS: roof|control**. Place it in the **Monitoring FX** section AFTER all your meters.
+6. **Load Plugin:** Add **JS: roof|control** in the **Monitoring FX** section AFTER all your meters (not on Master-track).
 
 ---
 
