@@ -70,7 +70,73 @@ Based on the well-known BS2B project, but with one significant modification. The
 The plugin is designed to function as a single, unified monitoring hub. Because of the external control system (which allows you to switch modes via toolbar buttons or scripts), all instances of the plugin will stay synchronized. You only need one copy of the plugin in your Monitoring FX chain to control your entire setup.
 * REAPER Exclusive: This plugin is designed specifically for REAPER. Due to the heavy use of shared memory (gmem) and the backend script, it will not work in other JSFX hosts (like ysfx).
 ---
+## DSP Block diagram
 
+```mermaid
+graph TD
+
+
+    Input([INPUT])
+    
+    %% Основные блоки
+    subgraph Modeling [" Modeling Modes "]
+        direction TB
+        M1[Main]
+        M2[Fullrange]
+        M3[Cubes]
+        M4[Vinyl]
+        M5[Smartphone]
+        M6[SLEW]
+        M7[Subwoofer]
+    end
+
+    subgraph TrueStereo [" True Stereo "]
+        direction TB
+        TS1[BS2B]
+        TS2[ITD Delay]
+    end
+
+    subgraph Correction ["🎧 Phones Correction "]
+        direction TB
+        C1[Biquad Filter Stack]
+        C2[Profile Gain]
+    end
+
+    HG[Headroom Gain <br/> -10dB]
+    Output([OUTPUT])
+
+    %% Логика маршрутизации
+    
+    %% Вход в блок моделирования
+    Input --> Modeling
+    
+    %% 1. Эти режимы проходят через True Stereo
+    M1 & M2 & M3 & M4 --> TrueStereo
+    
+    %% 2. Эти режимы идут сразу в коррекцию (минуя True Stereo)
+    M5 & M6 & M7 --> Correction
+
+    %% Связь после стерео в коррекцию
+    TrueStereo --> Correction
+    C1 --> C2
+    
+    %% Ветка DSP идет в Headroom Gain
+    C2 --> HG
+    
+    %% Ветка Байпаса (пунктиром) тоже идет в Headroom Gain
+    Input -.->|Bypass Path| HG
+
+    %% Финал
+    HG --> Output
+
+%% Стилизация (убираем заливку)
+    style Modeling fill:none,stroke:#333
+    style TrueStereo fill:none,stroke:#0052cc
+    style Correction fill:none,stroke:#008000
+    style HG fill:none,stroke:#e65100
+```
+
+---
 **P.S. Why the name "roof_bubrik"?**
 I have a studio cat named **Bubrik**. She is in charge of comfort and constantly monitors the operating temperature of my gear. She’s a vital team member—without her, everything would fall apart. Since the background script performs a similar "maintenance" role, I decided to name it after her. :)
 
