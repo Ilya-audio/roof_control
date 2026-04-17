@@ -52,7 +52,7 @@ filename:18,roof_control/gui/bypass.png
 filename:19,roof_control/gui/bypass_select.png
 
 slider1:0<0,1,1{off,on}>-bypass
-//slider2:0<-20,20,0.1>-bypass gain (dB)
+//slider2:0<-20,20,0.1>-bypass gain (dB) not use
 slider3:0<0,5,1{main,subwoofer,transient monitor,auracube,smartphone,vinyl,fullrange}>-mode
 // slider4 was destroyed :)
 slider5:0<0,1,1{on, off}>-stereo crossfeed (bs2b)
@@ -247,7 +247,7 @@ cf_delay_frac = cf_delay_spl - cf_delay_int;
 );
 
 update_params();
-setup_biquad_to_mem(mem_fullrange_f, 0, 260, 0, 0.707, 3); // HPF
+setup_biquad_to_mem(mem_fullrange_f, 0, 230, 0, 0.707, 3); // HPF for fullrange
 
 @slider
 slider6 != last_cf_cutoff || slider7 != last_cf_sup || slider5 != last_cf_state ? ( 
@@ -410,7 +410,7 @@ slider1 == 1 ? (
        sR_final = (mem_subs_R[25] * (1 - sub_iirAmount)) + (sR * sub_iirAmount);
        mem_subs_L[25] = sL_final; mem_subs_R[25] = sR_final;
  
-       // --- ШАГ 2: Фильтруем оригиналы через HPF 200Гц ---
+       // --- ШАГ 2: Фильтруем оригиналы через HPF ---
        hp = mem_fullrange_f;
        
        // Левый верх
