@@ -42,16 +42,29 @@ Based on the well-known BS2B project, but with one significant modification. The
 
 ## Installation
 
-1. **Download:** Get the latest release from the [Releases page](https://github.com/Ilya-audio/roof_JSFX_scripts/releases).
+1. **Download:** Get the latest release from the [Releases page](https://github.com/Ilya-audio/roof_control/releases).
 2. **Install:** Extract the contents into your **REAPER Resource Path**.
-3. **Set up your headphone profile**
+3. **Set up your headphone profile:**
     * Go to [autoeq.app](https://autoeq.app) and find your headphone model.
     * In the **Select Equalizer App** dropdown, choose **Custom Parametric EQ**.
     * Adjust filters: check if additional filters are available (AutoEQ defaults to 5).
     * Download the `.txt` profile and place it into: `*reaper resource folder*/Data/roof_control/phones_eq`.
-5. **Run Backend:** Go to the "Actions" menu, add and run the `roof_bubrik.lua` satellite script. 
-   * *Note: JSFX has limited file-handling, so this script is essential. If you use SWS, add it to your startup actions.*
-6. **Load Plugin:** Add **JS: roof|control** in the **Monitoring FX** section AFTER all your meters (not on Master-track).
+4. **Run Backend:** Go to the "Actions" menu, add and run the `roof_bubrik.lua` satellite script. 
+    * *Note: JSFX has limited file-handling, so this script is essential. If you use SWS, add it to your startup actions.*
+5. **Load Plugin:** Add **JS: roof|control** in the **Monitoring FX** section AFTER all your meters (not on Master-track).
+
+---
+
+## Optional: Toolbar Setup (Recommended)
+
+For a seamless workflow, you can create toolbar buttons to switch monitoring modes instantly without opening the plugin interface.
+
+* **Included Scripts:** The package includes individual scripts for each mode (`MAIN`, `SUBWOOFER`, `SLEW`, `CUBES`, `SMARTPHONE`, `VINYL`, `FULLRANGE`).
+* **Setup Instructions:**
+    1. Open the **Actions List** in REAPER and import all scripts starting with `Roof|control:`.
+    2. Right-click your desired Toolbar -> **Customize Toolbar**.
+    3. Add these actions as buttons.
+    4. **Visual Feedback:** The buttons will light up to show the currently active mode, staying perfectly in sync with the plugin.
 
 ---
 
