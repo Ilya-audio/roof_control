@@ -55,7 +55,7 @@ Based on the well-known BS2B project, but with one significant modification. The
 
 ---
 
-## Optional: Toolbar Setup (Recommended)
+## Optional: Toolbar Setup
 
 For a seamless workflow, you can create toolbar buttons to switch monitoring modes instantly without opening the plugin interface.
 
