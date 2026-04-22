@@ -82,7 +82,7 @@ For a seamless workflow, you can create toolbar buttons to switch monitoring mod
     * *My sweet spot: cutoff 800, suppression 6 dB, ITD 0.12 ms.*
 
 ## Technical Notes
-* File operations require the `roof_bubrik.lua` script to be running.
+* File operations and toolbar switching require the `roof_bubrik.lua` script to be running.
 * Global Synchronization (gmem):
 The plugin is designed to function as a single, unified monitoring hub. Because of the external control system (which allows you to switch modes via toolbar buttons or scripts), all instances of the plugin will stay synchronized. You only need one copy of the plugin in your Monitoring FX chain to control your entire setup.
 * REAPER Exclusive: This plugin is designed specifically for REAPER. Due to the heavy use of shared memory (gmem) and the backend script, it will not work in other JSFX hosts (like ysfx).
