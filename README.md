@@ -61,10 +61,11 @@ For a seamless workflow, you can create toolbar buttons to switch monitoring mod
 
 * **Included Scripts:** The package includes individual scripts for each mode (`MAIN`, `SUBWOOFER`, `SLEW`, `CUBES`, `SMARTPHONE`, `VINYL`, `FULLRANGE`).
 * **Setup Instructions:**
-    1. Open the **Actions List** in REAPER and import all scripts starting with `Roof|control:`.
+    1. Open the **Actions List** in REAPER and import all scripts starting with `roof_control_`.
     2. Right-click your desired Toolbar -> **Customize Toolbar**.
     3. Add these actions as buttons.
     4. **Visual Feedback:** The buttons will light up to show the currently active mode, staying perfectly in sync with the plugin.
+    5. **Custom Icons:** The package also includes **custom icons** for your toolbar to match each monitoring mode visually.
 
 ---
 
