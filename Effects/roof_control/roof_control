@@ -1,7 +1,7 @@
 /**
  * JSFX Name: roof_control
  * Author: Ilya Kuznetsov
- * Version: 0.93
+ * Version: 0.95
  * License: MIT
  * * Description: Headphone correction and mix-checking tool.
  * Includes algorithms from:
@@ -247,7 +247,7 @@ cf_delay_frac = cf_delay_spl - cf_delay_int;
 );
 
 update_params();
-setup_biquad_to_mem(mem_fullrange_f, 0, 225, 0, 0.707, 3); // HPF for fullrange
+setup_biquad_to_mem(mem_fullrange_f, 0, 200, 0, 0.707, 3); // HPF for fullrange
 
 @slider
 slider6 != last_cf_cutoff || slider7 != last_cf_sup || slider5 != last_cf_state ? ( 
@@ -269,18 +269,37 @@ gmem[2] == 2 ? ( gmem[2] = 0; hp_need_reload = 1; );
 // --- СИНХРОНИЗАЦИЯ С ТУЛБАРОМ (gmem[3]) ---
 
 // Проверка А: Если кто-то нажал кнопку в тулбаре (изменил gmem[3])
-gmem[3] != last_mode ? (
-  slider3 = gmem[3];    // Обновляем слайдер плагина
-  last_mode = gmem[3];  // Синхронизируем контрольную точку
-  fade_state = 1;       // Запускаем твой плавный переход (фейд)
-  slider_automate(slider3); // Сообщаем Риперу, что слайдер изменился
-);
+//gmem[3] != last_mode ? (
+//  slider3 = gmem[3];    // Обновляем слайдер плагина
+//  last_mode = gmem[3];  // Синхронизируем контрольную точку
+//  fade_state = 1;       // Запускаем твой плавный переход (фейд)
+//  slider_automate(slider3); // Сообщаем Риперу, что слайдер изменился
+//);
 
 // Проверка Б: Если ты изменил режим в самом плагине (GUI или слайдер)
-slider3 != gmem[3] ? (
-  gmem[3] = slider3;    // Пишем в память, чтобы кнопки тулбара зажглись/погасли
-  last_mode = slider3;  // Синхронизируем контроль
+//slider3 != gmem[3] ? (
+//  gmem[3] = slider3;    // Пишем в память, чтобы кнопки тулбара зажглись/погасли
+//  last_mode = slider3;  // Синхронизируем контроль
+//);
+
+// --- УМНАЯ СИНХРОНИЗАЦИЯ (v2.0) ---
+
+// 1. Приоритет внешнему управлению (Тулбар/Бубрик)
+gmem[3] != last_gmem3 ? (
+    slider3 = gmem[3];
+    last_mode = slider3;
+    last_gmem3 = gmem[3];
+    fade_state = 1; // Запускаем фейд
+    slider_automate(slider3);
 );
+
+// 2. Если ты покрутил слайдер в самом плагине
+slider3 != last_mode ? (
+    gmem[3] = slider3;
+    last_gmem3 = slider3;
+    last_mode = slider3;
+);
+
 
 hp_need_reload ? (
   hp_need_reload = 0; hp_num_filters = 0; hp_preamp_db = 0; scroll_pos = 0;
@@ -448,7 +467,6 @@ slider1 == 1 ? (
        fr_sR2 = origR * hp[2] - hpR * hp[4];
  
        // --- ШАГ 3: Финальный замес ---
-       // Вычитаем эмулированный саб из отфильтрованного сигнала
        spl0 = (hpL + sL_final);
        spl1 = (hpR + sR_final);
    );
@@ -507,6 +525,7 @@ slider1 == 1 ? (
 spl0 *= fade; spl1 *= fade;
 
 @gfx 1280 698
+
 ui_scale = min(gfx_w / canvas_w, gfx_h / canvas_h);
 off_x = (gfx_w - (canvas_w * ui_scale)) * 0.5;
 off_y = (gfx_h - (canvas_h * ui_scale)) * 0.5;
