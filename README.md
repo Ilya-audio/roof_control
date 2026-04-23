@@ -18,6 +18,12 @@ I own licenses for several commercial monitoring plugins, but I really wanted a 
 ## What makes it different?
 Roof|control combines headphone correction, crossfeed with adjustable ITD, and mix translation emulation into a single lightweight JSFX chain designed specifically for REAPER monitoring FX.
 
+### Video Demo & Audit Guide
+[![Roof|control Video Demo](https://img.youtube.com/vi/u_sbqv-6IHA/0.jpg)](https://www.youtube.com/watch?v=u_sbqv-6IHA)
+
+*Видео на русском языке, но я включил английские субтитры.*
+*The video is in Russian, but I've provided full English subtitles. I promised it, and I delivered! Check out the full audit process and plugin philosophy above.*
+
 ## Main Modules
 
 ### 1. Speaker Emulation Module
