@@ -230,6 +230,7 @@ Roof|control is built upon the foundation of several incredible open-source proj
 
 ---
 **P.S. Why the name "roof_bubrik"?**
+
 I have a studio cat named **Bubrik**. She is in charge of comfort and constantly monitors the operating temperature of my gear. She’s a vital team member—without her, everything would fall apart. Since the background script performs a similar "maintenance" role, I decided to name it after her. :)
 
 <p align="center">
