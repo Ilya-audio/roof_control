@@ -49,6 +49,65 @@ Based on the well-known BS2B project, but with one significant modification. The
 
 1. **Download:** Get the latest release from the [Releases page](https://github.com/Ilya-audio/roof_control/releases).
 2. **Install:** Extract the contents into your **REAPER Resource Path**.
+
+⚠️ Important: Directory Structure
+The directory structure must match the example below. If your structure differs from the reference, correct operation is not guaranteed.
+
+<details>
+<summary><b>📂 Click to view Directory Structure </b></summary>
+  
+```
+REAPER/ (Resource Path)
+├── Data/
+│   ├── roof_control/
+│   │   ├── gui/
+│   │   │   ├── background.png
+│   │   │   ├── background_dark.png
+│   │   │   ├── bypass.png
+│   │   │   ├── bypass_select.png
+│   │   │   ├── config.png
+│   │   │   ├── cubes.png
+│   │   │   ├── cubes_on.png
+│   │   │   ├── fullrange.png
+│   │   │   ├── fullrange_on.png
+│   │   │   ├── fullrange_select.png
+│   │   │   ├── main.png
+│   │   │   ├── main_on.png
+│   │   │   ├── slew.png
+│   │   │   ├── slew_on.png
+│   │   │   ├── smartphone.png
+│   │   │   ├── smartphone_on.png
+│   │   │   ├── sub.png
+│   │   │   ├── sub_on.png
+│   │   │   ├── vinyl.png
+│   │   │   └── vinyl.png
+│   │   └── phones_eq/     
+│   └── toolbar_icons/      
+│       ├── toolbar_roof_control_cube.png
+│       ├── toolbar_roof_control_full.png
+│       ├── toolbar_roof_control_main.png
+│       ├── toolbar_roof_control_slew.png
+│       ├── toolbar_roof_control_smartphone.png
+│       ├── toolbar_roof_control_sub.png
+│       └── toolbar_roof_control_vinyl.png
+├── Effects/
+│   └── roof_control/
+│       └── roof_control    
+└── Scripts/
+    └── roof_control/       
+        ├── roof_bubrik.lua
+        ├── roof_control_bypass.lua
+        ├── roof_control_cubes.lua
+        ├── roof_control_enable.lua
+        ├── roof_control_fullrange.lua
+        ├── roof_control_main.lua
+        ├── roof_control_slew.lua
+        ├── roof_control_smartphone.lua
+        ├── roof_control_subwoofer.lua
+        └── roof_control_vinyl.lua
+```
+</details>
+
 3. **Set up your headphone profile:**
     * Go to [autoeq.app](https://autoeq.app) and find your headphone model.
     * In the **Select Equalizer App** dropdown, choose **Custom Parametric EQ**.
