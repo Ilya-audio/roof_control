@@ -111,7 +111,7 @@ REAPER/ (Resource Path)
 3. **Set up your headphone profile:**
     * Go to [autoeq.app](https://autoeq.app) and find your headphone model.
     * In the **Select Equalizer App** dropdown, choose **Custom Parametric EQ**.
-    * Adjust filters: check if additional filters are available (AutoEQ defaults to 5).
+    * Adjust filters: AutoEQ defaults to 5; I recommend setting this to 10 for better accuracy.
     * Download the `.txt` profile and place it into: `*reaper resource folder*/Data/roof_control/phones_eq`.
 4. **Run Backend:** Go to the "Actions" menu, add and run the `roof_bubrik.lua` satellite script. 
     * *Note: JSFX has limited file-handling, so this script is essential. If you use SWS, add it to your startup actions.*
