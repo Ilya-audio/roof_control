@@ -51,6 +51,7 @@ Based on the well-known BS2B project, but with one significant modification. The
 2. **Install:** Extract the contents into your **REAPER Resource Path**.
 
 ⚠️ Important: Directory Structure
+
 The directory structure must match the example below. If your structure differs from the reference, correct operation is not guaranteed.
 
 <details>
