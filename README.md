@@ -131,6 +131,8 @@ For a seamless workflow, you can create toolbar buttons to switch monitoring mod
     3. Add these actions as buttons.
     4. **Visual Feedback:** The buttons will light up to show the currently active mode, staying perfectly in sync with the plugin.
     5. **Custom Icons:** The package also includes **custom icons** for your toolbar to match each monitoring mode visually.
+       
+    ⚠️ Please ensure that both the Monitoring FX chain and the plugin are NOT bypassed before loading profiles. To initialize correctly, both the plugin and Mon FX MUST be active. That's just a Reaper engine thing :)
 
 ---
 
