@@ -1,7 +1,7 @@
 /**
  * JSFX Name: roof_control
  * Author: Ilya Kuznetsov
- * Version: 0.95
+ * Version: 1.0.0
  * License: MIT
  * * Description: Headphone correction and mix-checking tool.
  * Includes algorithms from:
@@ -64,6 +64,8 @@ slider10:0<0,1,1{on, off}>-phones correction
 slider11:0<-12,12,0.1>-preamp gain (dB)
 
 @init
+
+ver_num = "1.0.0";
 // --- ПУТИ ---
 #db_path = "roof_control/hp.db";
 #preset_dir = "roof_control/phones_eq/";
@@ -78,15 +80,18 @@ mem_hp_s   = 2000;
 gfx_states = 10000; 
 num_layers = 9;
 
-mem_fullrange_f = 40000; // Выделим место в памяти под фильтр
-// И переменные состояния (state)
+mem_fullrange_f = 40000;
+//переменные состояния (state)
 fr_sL1 = fr_sL2 = fr_sR1 = fr_sR2 = 0;
 
 gmem[3] = slider3;
 last_mode = slider3;
+gmem[6] = slider1;     
+last_gmem4 = slider1;   
+last_bypass = slider1;  
 
 // --- CROSSFEED DELAY BUFFER ---
-cf_bufsize = 1024; // степень двойки!
+cf_bufsize = 1024; // степень двойки
 cf_bufmask = cf_bufsize - 1;
 
 cf_bufL = 30000;
@@ -102,7 +107,6 @@ p_gain;
 scroll_pos = 0;
 scroll_dir = 1;
 last_scroll_time = time_precise();
-//gfx_ext_retina = 1;
 canvas_w = 1280; canvas_h = 698;
 is_config_open = 0;
 sl_trim = 2.302585092994045684;
@@ -168,7 +172,7 @@ function setup_biquad_to_mem(mem_base, idx, f, g, q, type)
   ) : 
   (type == 1 || type == 2) ? ( // SHELVING (1: Low / 2: High)
     A = 10^(g/40);
-    // Эталонная альфа для шельфа
+    // Эталонная альфа
     alpha = (sinw / 2) * sqrt( (A + 1/A) * (1/q - 1) + 2 );
     type == 1 ? ( // LOW SHELF
       b0 = A*((A+1)-(A-1)*cosw+2*sqrt(A)*alpha); 
@@ -248,6 +252,7 @@ cf_delay_frac = cf_delay_spl - cf_delay_int;
 
 update_params();
 setup_biquad_to_mem(mem_fullrange_f, 0, 200, 0, 0.707, 3); // HPF for fullrange
+update_itd()
 
 @slider
 slider6 != last_cf_cutoff || slider7 != last_cf_sup || slider5 != last_cf_state ? ( 
@@ -257,30 +262,14 @@ slider6 != last_cf_cutoff || slider7 != last_cf_sup || slider5 != last_cf_state 
 slider1 != last_bypass ? ( memset(mem_hp_s, 0, 2048); last_bypass = slider1; );
 slider8 != last_hp_index ? ( last_hp_index = slider8; hp_need_reload = 1; );
 slider3 != last_mode ? (
-  fade_state = 1; // Запуск фейда при изменении слайдера
+  fade_state = 1;
   last_mode = slider3;
-  //update_itd();
+  update_itd();
 );
 
 @block
 srate!=last_srate ? ( last_srate=srate; update_params(); hp_need_reload = 1 );
 gmem[2] == 2 ? ( gmem[2] = 0; hp_need_reload = 1; );
-
-// --- СИНХРОНИЗАЦИЯ С ТУЛБАРОМ (gmem[3]) ---
-
-// Проверка А: Если кто-то нажал кнопку в тулбаре (изменил gmem[3])
-//gmem[3] != last_mode ? (
-//  slider3 = gmem[3];    // Обновляем слайдер плагина
-//  last_mode = gmem[3];  // Синхронизируем контрольную точку
-//  fade_state = 1;       // Запускаем твой плавный переход (фейд)
-//  slider_automate(slider3); // Сообщаем Риперу, что слайдер изменился
-//);
-
-// Проверка Б: Если ты изменил режим в самом плагине (GUI или слайдер)
-//slider3 != gmem[3] ? (
-//  gmem[3] = slider3;    // Пишем в память, чтобы кнопки тулбара зажглись/погасли
-//  last_mode = slider3;  // Синхронизируем контроль
-//);
 
 // --- УМНАЯ СИНХРОНИЗАЦИЯ (v2.0) ---
 
@@ -293,11 +282,27 @@ gmem[3] != last_gmem3 ? (
     slider_automate(slider3);
 );
 
-// 2. Если ты покрутил слайдер в самом плагине
+// 2. Изменение режима из интерфейса
 slider3 != last_mode ? (
     gmem[3] = slider3;
     last_gmem3 = slider3;
     last_mode = slider3;
+);
+
+// 3. Удаленное управление байпасом (через gmem[4])
+gmem[6] != last_gmem4 ? (
+    slider1 = gmem[6];         // Устанавливаем байпас из внешней памяти
+    last_bypass = slider1;     // Синхронизиро
+    last_gmem4 = gmem[6];      // Обновляем состояние gmem
+    fade_state = 1;            
+    slider_automate(slider1);  
+);
+
+// 4. Обратная связь
+slider1 != last_bypass ? (
+    gmem[6] = slider1;
+    last_gmem4 = slider1;
+    last_bypass = slider1;
 );
 
 
@@ -331,7 +336,7 @@ hp_need_reload ? (
   );
 
   strlen(#current_fn) > 0 ? (
-    // --- ОТОБРАЖАЕМОЕ ИМЯ (БЕЗ РАСШИРЕНИЯ) ---
+    // --- ОТОБРАЖАЕМОЕ ИМЯ ---
     strcpy(#hp_preset_name, #current_fn);
     _dot_pos = -1;
     _i = 0;
@@ -375,17 +380,17 @@ hp_need_reload ? (
 );
 
 @sample
-// 1. Обработка фейда (плавное переключение режимов)
+// 1. Обработка фейда
 fade_state == 1 ? ( fade -= fade_step; fade <= 0 ? ( fade = 0; fade_state = 2; ); );
 fade_state == 2 ? ( mode = slider3; reset_states(); fade_state = 3; );
 fade_state == 3 ? ( fade += fade_step; fade >= 1 ? ( fade = 1; fade_state = 0; ); );
 
-// 2. Проверка байпаса (Slider 1)
+// 2. Проверка внутреннего байпаса
 slider1 == 1 ? ( 
   spl0 *= b_gain; 
   spl1 *= b_gain; 
 ) : (
-  // 3. Выбор режима моделирования (Sub, Cube, Smartphone и т.д.)
+  // 3. Выбор режима моделирования
   mode == 1 ? ( // Subwoofer
     sL=spl0*1.42; sR=spl1*1.42; sg=((1.42-1)*0.75)+1; si=0;
     loop(25,
@@ -402,11 +407,11 @@ slider1 == 1 ? (
     sl_lastL = spl0; sl_lastR = spl1;
     spl0 = max(-1,min(1,slL)); spl1 = max(-1,min(1,slR));
   ) :
- mode == 3 ? ( // Auracube (теперь тоже на TDF2)
+ mode == 3 ? ( // Auracube
      as0 = spl0; as1 = spl1; ai = 0;
      loop(_num_aura,
        ap = mem_aura_f + ai*5; 
-       as_p = mem_aura_s + ai*4; // TDF2 нужно всего 4 ячейки (2 на L, 2 на R)
+       as_p = mem_aura_s + ai*4;
  
        // Левый канал
        aoutL = as0 * ap[0] + as_p[0];
@@ -439,7 +444,7 @@ slider1 == 1 ? (
  mode == 6 ? ( 
        origL = spl0; origR = spl1;
        
-       // --- ШАГ 1: Генерируем "Саб" (копия твоей логики из mode 1) ---
+       // Генерация Саба
        sL = origL * 1.42; sR = origR * 1.42; 
        sg = ((1.42-1)*0.75)+1; si = 0;
        loop(25,
@@ -453,7 +458,7 @@ slider1 == 1 ? (
        sR_final = (mem_subs_R[25] * (1 - sub_iirAmount)) + (sR * sub_iirAmount);
        mem_subs_L[25] = sL_final; mem_subs_R[25] = sR_final;
  
-       // --- ШАГ 2: Фильтруем оригиналы через HPF ---
+       // Фильтрация оригинала
        hp = mem_fullrange_f;
        
        // Левый верх
@@ -466,12 +471,12 @@ slider1 == 1 ? (
        fr_sR1 = origR * hp[1] - hpR * hp[3] + fr_sR2;
        fr_sR2 = origR * hp[2] - hpR * hp[4];
  
-       // --- ШАГ 3: Финальный замес ---
+       // Смешиваем
        spl0 = (hpL + sL_final);
        spl1 = (hpR + sR_final);
    );
 
-  // 4. Кроссфид (применяется поверх режимов 0, 3, 5, 6)
+  // 4. Кроссфид
   (slider5 == 0 && (mode == 0 || mode == 3 || mode == 5 || mode == 6)) ? (
     inL = spl0; inR = spl1; 
     loL = a0_lo*inL + b1_lo*loL; loR = a0_lo*inR + b1_lo*loR;
@@ -492,7 +497,7 @@ slider1 == 1 ? (
   );
   
 
-  // 5. КОРРЕКЦИЯ НАУШНИКОВ (Вынесена из условий mode, работает всегда)
+  // 5. коррекция
   slider10 == 0 ? (
   hpL = spl0; hpR = spl1; hi = 0;
   loop(hp_num_filters,
@@ -521,7 +526,7 @@ slider1 == 1 ? (
 );
 
 
-// Применяем мастер-фейд и байпас гейн
+// мастер-фейд
 spl0 *= fade; spl1 *= fade;
 
 @gfx 1280 698
@@ -544,35 +549,24 @@ function check_hit(idx) local(r, g, b, mx, my) (
 
 // --- 1. ФОН ---
 gfx_mode = 0; gfx_a = 1; gfx_x = off_x; gfx_y = off_y;
-// Если slider1 == 1 (Bypass On), рисуем background_dark (17), иначе обычный (0)
 gfx_blit(slider1 == 1 ? 17 : 0, ui_scale, 0);
 
-// --- 2. ЛОГИКА КНОПКИ BYPASS (Всегда активна) ---
+// --- 2. внутренний BYPASS ---
 hit_bypass = (!is_config_open) ? check_hit(18) : 0;
 hit_bypass ? gfx_states[18] = min(1, gfx_states[18] + 0.15) : gfx_states[18] = max(0, gfx_states[18] - 0.1);
 
-// Отрисовка подсвеченного слоя при наведении на байпас
 gfx_states[18] > 0 ? (
   gfx_mode = 0; gfx_x = off_x; gfx_y = off_y;
   gfx_a = gfx_states[18]; 
-  gfx_blit(19, ui_scale, 0); // bypass_select.png
+  gfx_blit(19, ui_scale, 0); 
 );
 
-// Отрисовка самой кнопки байпаса (основной слой)
-gfx_mode = 0; 
-gfx_x = off_x; 
-gfx_y = off_y;
-
-// Если slider1 == 1 (Bypass ON) -> непрозрачность 1.0
-// Если slider1 == 0 (Bypass OFF) -> непрозрачность 0.5
+gfx_mode = 0; gfx_x = off_x; gfx_y = off_y;
 gfx_a = (slider1 == 1) ? 1.0 : 0.7;
-
 gfx_blit(18, ui_scale, 0);
 
-// --- 3. ИНТЕРФЕЙС РЕЖИМОВ (Блокируется при активном байпасе) ---
+// --- 3. ИНТЕРФЕЙС РЕЖИМОВ ---
 !slider1 ? (
-  
-  // Отрисовка "горящего" индикатора текущего режима
   active_idx = -1;
   slider3 == 0 ? active_idx = 10;
   slider3 == 1 ? active_idx = 11;
@@ -587,14 +581,11 @@ gfx_blit(18, ui_scale, 0);
     gfx_blit(active_idx, ui_scale, 0);
   );
 
-  // Цикл отрисовки ховера для всех иконок выбора режима
   i = 0;
   loop(7, 
     i == 0 ? img = 3; i == 1 ? img = 4; i == 2 ? img = 5;
     i == 3 ? img = 2; i == 4 ? img = 6; i == 5 ? img = 1; i == 6 ? img = 14;
-
     is_active = (slider3 == i);
-    // Проверяем попадание, только если конфиг закрыт и это не текущий активный режим
     hit = (!is_config_open && !is_active) ? check_hit(img) : 0;
     hit ? gfx_states[img] = min(1, gfx_states[img] + 0.15) : gfx_states[img] = max(0, gfx_states[img] - 0.1);
     
@@ -607,7 +598,6 @@ gfx_blit(18, ui_scale, 0);
     i += 1;
   );
 
-  // Ховер для шестеренки настроек
   hit_config = (!is_config_open) ? check_hit(7) : 0;
   hit_config ? gfx_states[7] = min(1, gfx_states[7] + 0.15) : gfx_states[7] = max(0, gfx_states[7] - 0.1);
   gfx_states[7] > 0 ? (
@@ -617,7 +607,7 @@ gfx_blit(18, ui_scale, 0);
   );
 );
 
-// --- 4. ОКНО КОНФИГУРАЦИИ (Модальное) ---
+// --- 4. ОКНО КОНФИГУРАЦИИ ---
 is_config_open ? (
   gfx_mode = 0; gfx_r = 0; gfx_g = 0; gfx_b = 0; gfx_a = 0.7; 
   gfx_rect(0, 0, gfx_w, gfx_h); 
@@ -647,7 +637,7 @@ is_config_open ? (
   s_w = 560 * ui_scale; 
   right_col_x = s_x + s_w - 120 * ui_scale;
 
-  // Correction Profile Section
+  // Correction Section
   gfx_setfont(2, "Arial", 18 * ui_scale); gfx_r = 0.4; gfx_g = 0.4; gfx_b = 0.4;
   gfx_x = left_align; gfx_y = win_y + 110 * ui_scale; gfx_drawstr("CORRECTION PROFILE:");
   btn_eq_y = win_y + 145 * ui_scale;
@@ -671,21 +661,13 @@ is_config_open ? (
   gfx_r = is_hover_next ? 1 : 0.4; gfx_g = is_hover_next ? 0.8 : 0.4; gfx_b = 0;
   gfx_x = arrow_next_x; gfx_y = name_y; gfx_drawstr(">");
 
-  // Бегущая строка пресета
   gfx_measurestr(#hp_preset_name, name_w, name_h);
-  side_padding = 18 * ui_scale; 
-  name_w += side_padding * 2; 
-  padding = 10 * ui_scale;
-  clip_x = s_x + 35 * ui_scale + padding;
-  clip_w = arrow_next_x - clip_x - padding;
-  clip_y = name_y - 6;
-  clip_h = 45 * ui_scale;
-  diff = name_w - clip_w;
+  side_padding = 18 * ui_scale; name_w += side_padding * 2; padding = 10 * ui_scale;
+  clip_x = s_x + 35 * ui_scale + padding; clip_w = arrow_next_x - clip_x - padding;
+  clip_y = name_y - 6; clip_h = 45 * ui_scale; diff = name_w - clip_w;
 
   (diff > 0) ? (
-      _cur_t = time_precise();
-      _dt = _cur_t - last_scroll_time;
-      last_scroll_time = _cur_t;
+      _cur_t = time_precise(); _dt = _cur_t - last_scroll_time; last_scroll_time = _cur_t;
       is_eq_active ? (
           (scroll_pause_timer > 0) ? scroll_pause_timer -= _dt : (
             scroll_speed = 50 * ui_scale;
@@ -695,55 +677,35 @@ is_config_open ? (
           );
       );
       draw_x = -scroll_pos + side_padding; 
-  ) : (
-      draw_x = (clip_w - name_w) * 0.5 + side_padding;
-      scroll_pos = 0; 
-  );
+  ) : ( draw_x = (clip_w - name_w) * 0.5 + side_padding; scroll_pos = 0; );
 
-  gfx_dest = 100;
-  gfx_setimgdim(100, clip_w, clip_h);
-  gfx_r = 0.08; gfx_g = 0.08; gfx_b = 0.08; gfx_a = 1;
-  gfx_rect(0, 0, clip_w, clip_h); 
-  gfx_r = 0.1; gfx_g = 0.8; gfx_b = 1;
-  gfx_a = is_eq_active ? 1.0 : 0.25; 
-  gfx_x = draw_x; gfx_y = (clip_h - name_h) * 0.5;
-  gfx_drawstr(#hp_preset_name);
-  
-  // Градиентное затемнение краев бегущей строки
+  gfx_dest = 100; gfx_setimgdim(100, clip_w, clip_h);
+  gfx_r = 0.08; gfx_g = 0.08; gfx_b = 0.08; gfx_a = 1; gfx_rect(0, 0, clip_w, clip_h); 
+  gfx_r = 0.1; gfx_g = 0.8; gfx_b = 1; gfx_a = is_eq_active ? 1.0 : 0.25; 
+  gfx_x = draw_x; gfx_y = (clip_h - name_h) * 0.5; gfx_drawstr(#hp_preset_name);
   fade_w = 15 * ui_scale; 
   i = 0; loop(fade_w, gfx_a = 1 - (i / fade_w); gfx_r = 0.08; gfx_g = 0.08; gfx_b = 0.08; gfx_line(i, 0, i, clip_h); i += 1; );
   i = 0; loop(fade_w, gfx_a = i / fade_w; gfx_r = 0.08; gfx_g = 0.08; gfx_b = 0.08; gfx_line(clip_w - fade_w + i, 0, clip_w - fade_w + i, clip_h); i += 1; );
-  
   gfx_dest = -1; gfx_a = 1;
   gfx_blit(100, 1, 0, 0, 0, clip_w, clip_h, clip_x, clip_y, clip_w, clip_h);
 
-  // Service Info
   gfx_setfont(4, "Arial", 15 * ui_scale); gfx_r = 0.4; gfx_g = 0.4; gfx_b = 0.4;
   #info_str = ""; sprintf(#info_str, "Total: %d  |  Filters: %d", num_total_presets, hp_num_filters);
   gfx_measurestr(#info_str, info_w, info_h);
-  gfx_x = clip_x + (clip_w - info_w) * 0.5; gfx_y = clip_y + clip_h + 4 * ui_scale;
-  gfx_drawstr(#info_str);
+  gfx_x = clip_x + (clip_w - info_w) * 0.5; gfx_y = clip_y + clip_h + 4 * ui_scale; gfx_drawstr(#info_str);
 
-  // Кнопки управления в конфиге
   btn_upd_y = win_y + 148 * ui_scale; btn_upd_w = 120 * ui_scale; btn_upd_h = 35 * ui_scale;
   is_hover_upd = is_eq_active ? (mouse_x > right_col_x && mouse_x < right_col_x + btn_upd_w && mouse_y > btn_upd_y && mouse_y < btn_upd_y + btn_upd_h) : 0;
-  gfx_a = is_eq_active ? 1.0 : 0.25;
-  gfx_r = 0.15; gfx_g = is_hover_upd ? 0.7 : 0.4; gfx_b = 0.15;
+  gfx_a = is_eq_active ? 1.0 : 0.25; gfx_r = 0.15; gfx_g = is_hover_upd ? 0.7 : 0.4; gfx_b = 0.15;
   gfx_rect(right_col_x, btn_upd_y, btn_upd_w, btn_upd_h);
   gfx_r = 1; gfx_g = 1; gfx_b = 1; gfx_setfont(4, "Arial", 14 * ui_scale);
-  gfx_measurestr("UPDATE DB", u_w, u_h);
-  gfx_x = right_col_x + (btn_upd_w - u_w) * 0.5; gfx_y = btn_upd_y + (btn_upd_h - u_h) * 0.5; gfx_drawstr("UPDATE DB");
+  gfx_measurestr("UPDATE DB", u_w, u_h); gfx_x = right_col_x + (btn_upd_w - u_w) * 0.5; gfx_y = btn_upd_y + (btn_upd_h - u_h) * 0.5; gfx_drawstr("UPDATE DB");
 
-  // Слайдер Profile gain
   pre_y = win_y + 270 * ui_scale; pre_s_y = pre_y + 5 * ui_scale;
-  gfx_a = is_eq_active ? 1.0 : 0.25;
-  gfx_r = 0.15; gfx_g = 0.15; gfx_b = 0.15; gfx_rect(s_x, pre_s_y, s_w, 4 * ui_scale);
+  gfx_a = is_eq_active ? 1.0 : 0.25; gfx_r = 0.15; gfx_g = 0.15; gfx_b = 0.15; gfx_rect(s_x, pre_s_y, s_w, 4 * ui_scale);
   val11 = (slider11 + 12) / 24; gfx_r = 1; gfx_g = 0.6; gfx_b = 0.2; 
   gfx_circle(s_x + val11 * s_w, pre_s_y + 2 * ui_scale, 8 * ui_scale, 1);
-  gfx_setfont(2, "Arial", 18 * ui_scale);
-  gfx_x = s_x; gfx_y = pre_s_y - 28 * ui_scale; gfx_printf("Gain: %.1f dB", slider11);
-
-  // Кнопка Save
+  gfx_setfont(2, "Arial", 18 * ui_scale); gfx_x = s_x; gfx_y = pre_s_y - 28 * ui_scale; gfx_printf("Gain: %.1f dB", slider11);
 
   btn_pr_y = pre_s_y + 25 * ui_scale; btn_pr_w = 120 * ui_scale; btn_pr_h = 35 * ui_scale;
   is_h_save = is_eq_active ? (mouse_x > right_col_x && mouse_x < right_col_x + btn_pr_w && mouse_y > btn_pr_y && mouse_y < btn_pr_y + btn_pr_h) : 0;
@@ -753,17 +715,17 @@ is_config_open ? (
 
   // Crossfeed Section
   gfx_a = 1; gfx_setfont(2, "Arial", 18 * ui_scale); gfx_r = 0.4; gfx_g = 0.4; gfx_b = 0.4;
-  gfx_x = left_align; gfx_y = win_y + 400 * ui_scale; gfx_drawstr("TRUE STEREO MODELING:");
-  btn_cf_y = win_y + 435 * ui_scale;
+  gfx_x = left_align; gfx_y = win_y + 350 * ui_scale;
+  gfx_drawstr("TRUE STEREO MODELING:");
+  btn_cf_y = win_y + 385 * ui_scale;
   is_hover_cf = (mouse_x > left_align && mouse_x < left_align + 120 * ui_scale && mouse_y > btn_cf_y && mouse_y < btn_cf_y + 40 * ui_scale);
   gfx_r = (slider5 == 0) ? 0.1 : 0.3; gfx_g = (slider5 == 0) ? 0.6 : 0.1; gfx_b = (slider5 == 0) ? 0.2 : 0.1;
   gfx_rect(left_align, btn_cf_y, 120 * ui_scale, 40 * ui_scale);
   gfx_r = 1; gfx_g = 1; gfx_b = 1; gfx_x = left_align + 18 * ui_scale; gfx_y = btn_cf_y + 11 * ui_scale;
   gfx_drawstr(slider5 == 0 ? "ENABLED" : "DISABLED");
 
-  s_y_start = win_y + 480 * ui_scale; s_step = 60 * ui_scale;
+  s_y_start = win_y + 430 * ui_scale; s_step = 60 * ui_scale;
   gfx_a = slider5 == 0 ? 1.0 : 0.25;
-  
   gfx_r = 0.15; gfx_g = 0.15; gfx_b = 0.15; gfx_rect(s_x, s_y_start, s_w, 4 * ui_scale);
   val6 = (slider6 - 300) / 900; gfx_r = 0.1; gfx_g = 0.8; gfx_b = 1; 
   gfx_circle(s_x + val6 * s_w, s_y_start + 2 * ui_scale, 9 * ui_scale, 1);
@@ -780,20 +742,28 @@ is_config_open ? (
   val9 = slider9 / 0.7; gfx_r = 0.1; gfx_g = 0.8; gfx_b = 1;
   gfx_circle(s_x + val9 * s_w, s9_y + 2 * ui_scale, 9 * ui_scale, 1);
   gfx_x = s_x; gfx_y = s9_y - 28 * ui_scale; gfx_printf("ITD: %.2f ms", slider9);
+
+  // --- НОВАЯ СЕРВИСНАЯ СТРОКА ВНИЗУ ОКНА ---
+  gfx_setfont(4, "Arial", 15 * ui_scale); gfx_r = 0.3; gfx_g = 0.3; gfx_b = 0.3; gfx_a = 1;
+  #serv_str = ""; 
+  #bub_status = gmem[5] ? "online" : "offline";
+  sprintf(#serv_str, "roof_bubrik: %s   |   version: %s", #bub_status, ver_num);
+  gfx_measurestr(#serv_str, sw_w, sw_h);
+  gfx_x = win_x + (win_w - sw_w) * 0.5; 
+  gfx_y = win_y + win_h - 25 * ui_scale;
+  gfx_drawstr(#serv_str);
 );
 
 // --- 5. ОБРАБОТКА МЫШИ ---
 (mouse_cap & 1) ? (
   !is_config_open ? (
     !(last_cap & 1) ? (
-      // Байпас работает всегда
       check_hit(18) ? (
         slider1 = 1 - slider1; 
         slider_automate(slider1);
         scroll_pos = 0; scroll_dir = 1; scroll_pause_timer = 2;
         fade_state = 1;
       ) : 
-      // Остальные кнопки только если байпас выключен
       !slider1 ? (
         check_hit(3) ? (slider3 = 0; slider_automate(slider3); fade_state = 1;);
         check_hit(4) ? (slider3 = 1; slider_automate(slider3); fade_state = 1;);
@@ -806,7 +776,6 @@ is_config_open ? (
       );
     );
   ) : (
-    // Логика внутри конфига
     !(last_cap & 1) ? (
       curr_t = time_precise(); is_double = (curr_t - last_click_time < 0.25); last_click_time = curr_t;
       active_slider = 0;
@@ -833,7 +802,6 @@ is_config_open ? (
       (mouse_x < win_x || mouse_x > win_x + win_w || mouse_y < win_y || mouse_y > win_y + win_h) ? is_config_open = 0;
     );
     
-    // Перетаскивание слайдеров
     active_slider == 6 ? (slider6 = max(300, min(1200, 300 + ((mouse_x - s_x) / s_w) * 900)); slider_automate(slider6); update_bs2b(););
     active_slider == 7 ? (slider7 = max(1, min(10, 1 + ((mouse_x - s_x) / s_w) * 9)); slider_automate(slider7); update_bs2b(););
     active_slider == 9 ? (slider9 = max(0, min(0.7, ((mouse_x - s_x) / s_w) * 0.7)); slider_automate(slider9); update_itd(););
@@ -842,23 +810,16 @@ is_config_open ? (
 ) : ( active_slider = 0; );
 last_cap = mouse_cap;
 
-// --- 6. КРУПНАЯ НАДПИСЬ BYPASS ПО ЦЕНТРУ ---
+// --- 6. НАДПИСЬ BYPASS ---
 slider1 == 1 ? (
   gfx_setfont(10, "Arial", 80 * ui_scale, 'b');
   #bypass_text = "BYPASS";
   gfx_measurestr(#bypass_text, b_w, b_h);
-  
-  // Рассчитываем базовые координаты центра
   base_x = (gfx_w - b_w) * 0.5;
   base_y = (gfx_h - b_h) * 0.5;
-  
-  // 1. Рисуем тень
   gfx_x = base_x; gfx_y = base_y;
   gfx_r = 0; gfx_g = 0; gfx_b = 0; gfx_a = 0.5;
   gfx_drawstr(#bypass_text); 
-  
-  // 2. Рисуем основной текст поверх со смещением
-  // Возвращаемся к base_x, а не считаем от конца тени!
   gfx_x = base_x - 3 * ui_scale; 
   gfx_y = base_y - 3 * ui_scale;
   gfx_r = 0.9; gfx_g = 0.9; gfx_b = 0.9; gfx_a = 0.9;
