@@ -1,10 +1,19 @@
 -- @description roof_bubrik - roof|control backend service
--- @version 0.95
+-- @version 1.0.0
 -- @author Ilya
 -- @about
---   Part of the Roof|control headphone monitoring system.
---   Handles database synchronization, profile saving, and toolbar states.
---   https://github.com/Ilya-audio/roof_control
+--    Part of the Roof|control headphone monitoring system.
+--    Handles database synchronization, profile saving, and BOTH toolbar states (Enable/Bypass/Mode switch).
+--    Logic: gmem[6]=1 is Bypass (Bypass button lit), gmem[6]=0 is Enable (Enable button lit).
+--
+--    /\_/\
+--   ( =.= )
+--    > ^ <
+--   /     \
+--  |       |
+--  \__|||__/_
+--            \ )
+
 
 local mem_name = "roof_mem"
 reaper.gmem_attach(mem_name)
@@ -18,12 +27,18 @@ local src_dir = base_dir .. sep .. "phones_eq"
 local db_path = base_dir .. sep .. "hp.db"
 
 -----------------------------------------------------------
--- БЛОК ТУЛБАРА (OPTIMIZED LOGIC)
+-- БЛОК ТУЛБАРА (DUAL LOGIC: ENABLE & BYPASS)
 -----------------------------------------------------------
 local last_visual_mode = -1
+local last_visual_state6 = -1
 local button_ids = {}
+local enable_id = 0
+local bypass_id = 0
 
--- Твои хеши кнопок
+-- Хеши
+local enable_hash = "_RS290f4607ca9367eaba4028c22fd971ae7b098b12"
+local bypass_hash = "_RS1d037cea6cc20a39e5a5900dbe244e1b983d540c"
+
 local mode_buttons = {
     [0] = "_RSc5baed1e3a0d5a5f102eac5ed4fb116e7571a8fd", -- main
     [1] = "_RS3adcbd2aea112bb9d6de420ba8e89440d3e7e7b8", -- subwoofer
@@ -37,23 +52,22 @@ local mode_buttons = {
 function InitButtonIDs()
     for mode, hash in pairs(mode_buttons) do
         local id = reaper.NamedCommandLookup(hash)
-        if id and id > 0 then
-            button_ids[mode] = id
-        end
+        if id and id > 0 then button_ids[mode] = id end
     end
+    enable_id = reaper.NamedCommandLookup(enable_hash)
+    bypass_id = reaper.NamedCommandLookup(bypass_hash)
 end
 
 function UpdateToolbarStates()
+    -- 1. ЛОГИКА РЕЖИМОВ
     local current_mode = reaper.gmem_read(3)
-    local source_from_button = reaper.gmem_read(4) -- 1 = от кнопки, 0 = от JSFX
+    local source_from_button = reaper.gmem_read(4) 
     
     if current_mode ~= last_visual_mode then
         if source_from_button == 1 then
-            -- Если кнопка сама себя зажгла, просто сбрасываем флаг
             reaper.gmem_write(4, 0) 
             last_visual_mode = current_mode
         else
-            -- Если переключили в JSFX, обновляем иконки (с задержкой defer)
             for mode, cmd_id in pairs(button_ids) do
                 if cmd_id and cmd_id > 0 then
                     local state = (mode == current_mode) and 1 or 0
@@ -64,10 +78,32 @@ function UpdateToolbarStates()
             last_visual_mode = current_mode
         end
     end
+
+    -- 2. ДВОЙНАЯ ЛОГИКА ПИТАНИЯ (gmem[6])
+    -- 1 = Bypass Active, 0 = Plugin Active (Enable)
+    local state6 = reaper.gmem_read(6)
+    if state6 ~= last_visual_state6 then
+        
+        -- Кнопка ENABLE: горит, когда в памяти 0 (плагин работает)
+        if enable_id and enable_id > 0 then
+            local enable_val = (state6 == 0) and 1 or 0
+            reaper.SetToggleCommandState(0, enable_id, enable_val)
+            reaper.RefreshToolbar2(0, enable_id)
+        end
+        
+        -- Кнопка BYPASS: горит, когда в памяти 1 (байпас включен)
+        if bypass_id and bypass_id > 0 then
+            local bypass_val = (state6 == 1) and 1 or 0
+            reaper.SetToggleCommandState(0, bypass_id, bypass_val)
+            reaper.RefreshToolbar2(0, bypass_id)
+        end
+        
+        last_visual_state6 = state6
+    end
 end
 
 -----------------------------------------------------------
--- ФУНКЦИИ BACKEND (DB & FILES)
+-- БЭКЕНД ФУНКЦИИ (DB & FILES)
 -----------------------------------------------------------
 
 function GetFolderFiles()
@@ -75,9 +111,7 @@ function GetFolderFiles()
     local i = 0
     repeat
         local name = reaper.EnumerateFiles(src_dir, i)
-        if name then
-            if name:lower():match("%.txt$") then table.insert(files, name) end
-        end
+        if name then if name:lower():match("%.txt$") then table.insert(files, name) end end
         i = i + 1
     until not name
     table.sort(files)
@@ -158,29 +192,17 @@ end
 -----------------------------------------------------------
 
 function Main()
-    -- Сообщаем, что бэкенд жив
     reaper.gmem_write(5, 1)
-
     local cmd = reaper.gmem_read(0)
-    if cmd == 1 then
-        reaper.gmem_write(0, 0)
-        SyncDatabase()
-    elseif cmd == 2 then
-        reaper.gmem_write(0, 0)
-        CheckDB()
-    elseif cmd == 3 then
-        reaper.gmem_write(0, 0)
-        SaveProfile()
-    end
+    if cmd == 1 then reaper.gmem_write(0, 0) SyncDatabase()
+    elseif cmd == 2 then reaper.gmem_write(0, 0) CheckDB()
+    elseif cmd == 3 then reaper.gmem_write(0, 0) SaveProfile() end
 
     UpdateToolbarStates()
     reaper.defer(Main)
 end
 
--- При выходе обнуляем статус "живучести"
-reaper.atexit(function()
-    reaper.gmem_write(5, 0)
-end)
+reaper.atexit(function() reaper.gmem_write(5, 0) end)
 
 -- СТАРТ
 InitButtonIDs()

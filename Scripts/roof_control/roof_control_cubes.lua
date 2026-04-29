@@ -1,5 +1,5 @@
 -- @description Roof|control: CUBES (Mode Switch)
--- @version 0.95
+-- @version 1.0.0
 -- @author Ilya
 -- @link https://github.com/Ilya-audio/roof_control
 -- @about
