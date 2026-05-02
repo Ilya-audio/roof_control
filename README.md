@@ -232,6 +232,17 @@ Roof|control is built upon the foundation of several incredible open-source proj
   Conceptual and algorithmic inspiration for the Vinyl, Smartphone, Subwoofer, and SLEW translation modes.
 
 ---
+
+## Support the Project
+
+If you find **Roof|control** useful and would like to support its further development, I would be deeply grateful. 
+
+* **Russia & CIS:** You can support the project via **[Boosty](https://boosty.to/rooftopstudio)**. This is currently the most reliable way to send a donation.
+* **Rest of the World:** At the moment, there is no direct way to accept international donations due to banking restrictions. However, I am working on finding a solution. Stay tuned!
+
+> **Note:** Every donation helps me dedicate more time to refining the algorithms and adding new features. Thank you for your support!
+
+---
 **P.S. Why the name "roof_bubrik"?**
 
 I have a studio cat named **Bubrik**. She is in charge of comfort and constantly monitors the operating temperature of my gear. She’s a vital team member—without her, everything would fall apart. Since the background script performs a similar "maintenance" role, I decided to name it after her. :)
