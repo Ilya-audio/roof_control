@@ -1,7 +1,7 @@
 /**
  * JSFX Name: roof_control
  * Author: Ilya Kuznetsov
- * Version: 1.0.0
+ * Version: 1.1.0
  * License: MIT
  * * Description: Headphone correction and mix-checking tool.
  * Includes algorithms from:
@@ -52,20 +52,20 @@ filename:18,roof_control/gui/bypass.png
 filename:19,roof_control/gui/bypass_select.png
 
 slider1:0<0,1,1{off,on}>-bypass
-//slider2:0<-20,20,0.1>-bypass gain (dB) not use
+slider2:-7<-20,0,0.1>-headroom gain (dB)
 slider3:0<0,5,1{main,subwoofer,transient monitor,auracube,smartphone,vinyl,fullrange}>-mode
 // slider4 was destroyed :)
 slider5:0<0,1,1{on, off}>-stereo crossfeed (bs2b)
-slider6:700<300,1200,1>-crossfeed cutoff (Hz)
-slider7:4.5<1.0,10.0,0.1>-crossfeed suppression (dB)
+slider6:800<300,1200,1>-crossfeed cutoff (Hz)
+slider7:6.1<1.0,10.0,0.1>-crossfeed suppression (dB)
 slider8:0<0,1000,1>-hp_index (hidden)
-slider9:0<0,0.7,0.01>-crossfeed delay (ms)
+slider9:0.23<0,0.7,0.01>-crossfeed delay (ms)
 slider10:0<0,1,1{on, off}>-phones correction
 slider11:0<-12,12,0.1>-preamp gain (dB)
 
 @init
 
-ver_num = "1.0.0";
+ver_num = "1.1.0";
 // --- ПУТИ ---
 #db_path = "roof_control/hp.db";
 #preset_dir = "roof_control/phones_eq/";
@@ -102,7 +102,8 @@ cf_writepos = 0;
 #hp_preset_name = "";
 #current_fn = ""; 
 
-b_gain = 0.31622776601683793319988935444327;
+//b_gain = 0.31622776601683793319988935444327;
+b_gain = 10^(slider2 / 20);
 p_gain;
 scroll_pos = 0;
 scroll_dir = 1;
@@ -113,14 +114,14 @@ sl_trim = 2.302585092994045684;
 hp_need_reload = 1;
 fade_state = 0; //0:nofade 1:fadeout 2:switchmode 3:fadein
 fade = 1;
-fade_step = 0.025;
+fade_step = 0.006;
 mode = slider3;
 active_slider = 0;
 
 function save_profile()
 (
   gmem[0] = 3;
-  gmem[1] = slider11;
+  gmem[7] = slider11;
 
   i = 0;
   loop(256,
@@ -255,6 +256,9 @@ setup_biquad_to_mem(mem_fullrange_f, 0, 200, 0, 0.707, 3); // HPF for fullrange
 update_itd()
 
 @slider
+
+b_gain = 10^(slider2 / 20);
+
 slider6 != last_cf_cutoff || slider7 != last_cf_sup || slider5 != last_cf_state ? ( 
   update_bs2b(); 
   last_cf_cutoff = slider6; last_cf_sup = slider7; last_cf_state = slider5;
@@ -612,7 +616,7 @@ is_config_open ? (
   gfx_mode = 0; gfx_r = 0; gfx_g = 0; gfx_b = 0; gfx_a = 0.7; 
   gfx_rect(0, 0, gfx_w, gfx_h); 
   
-  win_w = 900 * ui_scale; win_h = 650 * ui_scale; 
+  win_w = 1024 * ui_scale; win_h = 600 * ui_scale; 
   win_x = (gfx_w - win_w) * 0.5; win_y = (gfx_h - win_h) * 0.5;
   gfx_r = 0.08; gfx_g = 0.08; gfx_b = 0.08; gfx_a = 1; 
   gfx_rect(win_x, win_y, win_w, win_h); 
@@ -752,7 +756,34 @@ is_config_open ? (
   gfx_x = win_x + (win_w - sw_w) * 0.5; 
   gfx_y = win_y + win_h - 25 * ui_scale;
   gfx_drawstr(#serv_str);
+
+  // --- HEADROOM VERTICAL SLIDER ---
+    hr_x = win_x + win_w - 110 * ui_scale; // Позиция справа
+    hr_y = win_y + 140 * ui_scale;       // Начало на уровне секции профиля
+    hr_h = 380 * ui_scale;               // Высота слайдера
+    hr_w = 6 * ui_scale;                 // Ширина дорожки
+    
+    // Дорожка
+    gfx_r = 0.15; gfx_g = 0.15; gfx_b = 0.15; gfx_a = 1;
+    gfx_rect(hr_x - hr_w/2, hr_y, hr_w, hr_h);
+    
+    // Ручка (Кноб)
+    val2 = (slider2 + 20) / 20; // Преобразуем -20..0 в 0..1
+    knob_y = hr_y + hr_h - (val2 * hr_h);
+    gfx_r = 1; gfx_g = 0.3; gfx_b = 0.3; // Красноватый оттенок для мастера
+    gfx_circle(hr_x, knob_y, 10 * ui_scale, 1);
+    
+    // Подпись
+    gfx_setfont(4, "Arial", 14 * ui_scale); gfx_r = 0.5;
+    gfx_measurestr("HEADROOM", h_w, h_h);
+    gfx_x = hr_x - h_w/2; gfx_y = hr_y - 30 * ui_scale; gfx_drawstr("HEADROOM");
+    gfx_x = hr_x - 15 * ui_scale; gfx_y = hr_y + hr_h + 15 * ui_scale; 
+    gfx_printf("%.1f", slider2);
+
+
 );
+
+
 
 // --- 5. ОБРАБОТКА МЫШИ ---
 (mouse_cap & 1) ? (
@@ -794,6 +825,10 @@ is_config_open ? (
       is_h_save ? save_profile();
       is_hover_cf ? ( slider5 = 1 - slider5; slider_automate(slider5); update_bs2b(); );
       
+      (mouse_x > hr_x - 20 && mouse_x < hr_x + 20 && mouse_y > hr_y - 10 && mouse_y < hr_y + hr_h + 10) ? (
+                active_slider = 2;
+            );
+      
       slider5 == 0 ? (
         (mouse_x > s_x-10 && mouse_x < s_x+s_w+10 && mouse_y > s_y_start-20 && mouse_y < s_y_start+20) ? (is_double ? (slider6=700; slider_automate(slider6); update_bs2b();) : active_slider=6;);
         (mouse_x > s_x-10 && mouse_x < s_x+s_w+10 && mouse_y > s_y_start+s_step-20 && mouse_y < s_y_start+s_step+20) ? (is_double ? (slider7=4.5; slider_automate(slider7); update_bs2b();) : active_slider=7;);
@@ -806,6 +841,13 @@ is_config_open ? (
     active_slider == 7 ? (slider7 = max(1, min(10, 1 + ((mouse_x - s_x) / s_w) * 9)); slider_automate(slider7); update_bs2b(););
     active_slider == 9 ? (slider9 = max(0, min(0.7, ((mouse_x - s_x) / s_w) * 0.7)); slider_automate(slider9); update_itd(););
     active_slider == 11 ? (slider11 = max(-12, min(12, -12 + ((mouse_x - s_x) / s_w) * 24)); slider11 = floor(slider11 * 10) / 10; slider_automate(slider11); );
+    active_slider == 2 ? (
+          slider2 = max(-20, min(0, -20 + ((hr_y + hr_h - mouse_y) / hr_h) * 20));
+          slider2 = floor(slider2 * 10) / 10;
+          slider_automate(slider2);
+          b_gain = 10^(slider2 / 20);
+        );
+  
   );
 ) : ( active_slider = 0; );
 last_cap = mouse_cap;
