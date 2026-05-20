@@ -187,7 +187,7 @@ graph TD
         C2[Profile Gain]
     end
 
-    HG[Headroom Gain <br/> -10dB]
+    HG[Headroom Gain <br/>]
     Output([OUTPUT])
 
     %% Логика маршрутизации
