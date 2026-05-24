@@ -1,5 +1,5 @@
 -- @description roof_bubrik - roof|control backend service
--- @version 1.0.0
+-- @version 1.1.1
 -- @author Ilya
 -- @about
 --    Part of the Roof|control headphone monitoring system.
@@ -162,7 +162,7 @@ function CheckDB()
 end
 
 function SaveProfile()
-    local gain = reaper.gmem_read(1)
+    local gain = reaper.gmem_read(7)
     local chars = {}
     for i = 0, 255 do
         local ch = reaper.gmem_read(10 + i)

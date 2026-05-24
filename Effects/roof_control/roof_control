@@ -1,7 +1,7 @@
 /**
  * JSFX Name: roof_control
  * Author: Ilya Kuznetsov
- * Version: 1.1.0
+ * Version: 1.1.1
  * License: MIT
  * * Description: Headphone correction and mix-checking tool.
  * Includes algorithms from:
@@ -65,7 +65,7 @@ slider11:0<-12,12,0.1>-preamp gain (dB)
 
 @init
 
-ver_num = "1.1.0";
+ver_num = "1.1.1";
 // --- ПУТИ ---
 #db_path = "roof_control/hp.db";
 #preset_dir = "roof_control/phones_eq/";
@@ -102,7 +102,6 @@ cf_writepos = 0;
 #hp_preset_name = "";
 #current_fn = ""; 
 
-//b_gain = 0.31622776601683793319988935444327;
 b_gain = 10^(slider2 / 20);
 p_gain;
 scroll_pos = 0;
@@ -241,7 +240,8 @@ function update_params()
   setup_biquad_to_mem(mem_aura_f,na,7850,-11.8,0.7,2); na+=1;
   setup_biquad_to_mem(mem_aura_f,na,7850,0,0.707,4); na+=1;
   setup_biquad_to_mem(mem_aura_f,na,7850,0,0.707,4); na+=1;
-  _num_aura=na; update_bs2b();
+  _num_aura=na; 
+  update_bs2b();
 );
 
 function update_itd()
@@ -322,7 +322,7 @@ hp_need_reload ? (
       i == slider8 ? (
         strcpy(#current_fn, #line);
         
-        // --- УМНАЯ ОЧИСТКА ПЕРЕНОСОВ СТРОК (\r, \n) ---
+        // --- ОЧИСТКА ПЕРЕНОСОВ СТРОК (\r, \n) ---
         _len = strlen(#current_fn);
         while(_len > 0 && (
           str_getchar(#current_fn, _len-1) == 10 || // \n
