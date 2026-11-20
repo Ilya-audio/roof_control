@@ -1,7 +1,7 @@
 /**
  * JSFX Name: roof_control
  * Author: Ilya Kuznetsov
- * Version: 1.1.1
+ * Version: 1.1.2
  * License: MIT
  * * Description: Headphone correction and mix-checking tool.
  * Includes algorithms from:
@@ -65,7 +65,7 @@ slider11:0<-12,12,0.1>-preamp gain (dB)
 
 @init
 
-ver_num = "1.1.1";
+ver_num = "1.1.2";
 // --- ПУТИ ---
 #db_path = "roof_control/hp.db";
 #preset_dir = "roof_control/phones_eq/";
