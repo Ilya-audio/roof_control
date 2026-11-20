@@ -1,0 +1,5 @@
+NAME "Roof|control"
+AUTHOR "Ilya Kuznetsov"
+VERSION "1.1.2"
+URL "https://github.com/Ilya-audio/roof_control"
+INFO "roof_control_readme.txt"
